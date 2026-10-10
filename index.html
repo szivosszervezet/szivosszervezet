@@ -25,15 +25,23 @@
 <link rel="icon" href="favicon.png">
 <link rel="apple-touch-icon" href="favicon.png">
 
+<link rel="preload" href="papir.jpg" as="image">
 <link rel="preload" href="barlow-800.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="spacemono.woff2" as="font" type="font/woff2" crossorigin>
 
 <style>
   @font-face {
     font-family: "Barlow Condensed";
     font-weight: 800;
+    font-style: normal;
     font-display: swap;
     src: url("barlow-800.woff2") format("woff2");
+  }
+  @font-face {
+    font-family: "Barlow Condensed";
+    font-weight: 800;
+    font-style: italic;
+    font-display: swap;
+    src: url("barlow-800-dolt.woff2") format("woff2");
   }
   @font-face {
     font-family: "Space Mono";
@@ -44,15 +52,12 @@
 
   :root {
     --ink: #171717;
+    --tinta: #1c2034;        /* a logó sötétkékje: „nyomdafesték” */
     --paper: #f2f0ea;
-    --lila: #6b3bb0;
+    --lila: #65369b;
     --bordo: #8e2638;
     --korall: #fd6046;
-    --cian: #1ff4ff;         /* a glitch „hideg” csatornája */
-    --ibolya: #c03cff;       /* a glitch „meleg” csatornája */
     --beat: 0.9s;            /* ~67 ütés/perc */
-    --glitch: 7s;            /* ennyi időnként „akad meg” az adás */
-    --oszlop: 368px;
     --mono: "Space Mono", ui-monospace, monospace;
   }
 
@@ -63,10 +68,7 @@
   body {
     min-height: 100vh;
     min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var(--paper);
+    color: var(--tinta);
     font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
     font-weight: 800;
     background: var(--ink) url("textura.jpg") repeat;
@@ -74,346 +76,328 @@
     overflow-x: hidden;
   }
 
-  /* képernyő-hatás: finom pásztázó vonalak + sötétedő sarkok */
-  body::before,
+  /* utcai lámpa fénye a falon + sötétebb szélek */
   body::after {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 20;
-  }
-  body::before {
-    background: repeating-linear-gradient(to bottom,
-      rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0) 2px,
-      rgba(0, 0, 0, .2) 2px, rgba(0, 0, 0, .2) 3px);
-  }
-  body::after {
-    background: radial-gradient(ellipse at 50% 45%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, .55) 100%);
+    z-index: 30;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 22%, rgba(255, 228, 196, .09), rgba(255, 228, 196, 0) 70%),
+      radial-gradient(ellipse at 50% 40%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, .55) 100%);
   }
 
-  .lap {
-    width: min(100% - 44px, var(--oszlop));
-    margin: auto 0;
-    padding: max(clamp(32px, 7vh, 72px), env(safe-area-inset-top)) 0 28px;
+  .fal {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: max(clamp(34px, 7vh, 80px), env(safe-area-inset-top)) 0 0;
+    overflow: hidden;
   }
 
-  /* ================= Logó: dobogó szívek + adáshiba ================= */
+  /* ================= Régi plakátok és cafatok a falon ================= */
 
-  .logo {
-    width: 100%;
-    animation:
-      bekapcs .6s steps(1) both,
-      remeg var(--glitch) steps(1) infinite 1.2s;
+  .regi {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+  }
+  /* egy régi lila plakát cafatja – a posztod textúrájából, szöveg nélküli részből */
+  .regi-lila {
+    width: 230px;
+    height: 260px;
+    top: 10px;
+    left: calc(50% - 300px);
+    background: var(--lila) url("plakat-lila.jpg") -560px -420px / 900px auto no-repeat;
+    transform: rotate(-8deg);
+    filter: brightness(.62) saturate(.85);
+    clip-path: polygon(0 3%, 18% 0, 40% 4%, 63% 0, 84% 5%, 100% 1%, 97% 22%, 100% 41%, 93% 56%,
+                       97% 70%, 86% 79%, 74% 74%, 61% 86%, 47% 80%, 33% 92%, 19% 85%, 7% 96%, 0 88%, 3% 60%, 0 34%);
   }
 
-  .jel {
+  .cafat {
+    background: var(--paper) url("papir.jpg") center / 600px auto;
+    filter: brightness(.58) sepia(.25);
+  }
+  .cafat-1 {
+    width: 150px;
+    height: 120px;
+    top: 52%;
+    left: calc(50% + 150px);
+    transform: rotate(9deg);
+    clip-path: polygon(0 4%, 22% 0, 48% 6%, 70% 0, 100% 8%, 92% 34%, 100% 58%, 81% 72%,
+                       88% 100%, 60% 88%, 34% 100%, 12% 86%, 0 94%, 6% 60%, 0 30%);
+  }
+  .cafat-2 {
+    width: 110px;
+    height: 70px;
+    bottom: 13%;
+    left: calc(50% - 215px);
+    transform: rotate(-14deg);
+    background: var(--bordo);
+    filter: brightness(.55);
+    clip-path: polygon(0 10%, 30% 0, 62% 8%, 100% 0, 94% 45%, 100% 100%, 64% 90%, 28% 100%, 6% 82%);
+  }
+
+  /* ================= A fő plakát ================= */
+
+  .plakat {
     position: relative;
-    width: 78%;
+    z-index: 2;
+    width: min(100% - 36px, 400px);
+    transform: rotate(-1.2deg);
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .6)) drop-shadow(0 14px 22px rgba(0, 0, 0, .4));
+    animation: kiragaszt .55s cubic-bezier(.2, .8, .3, 1) both;
+  }
+  @keyframes kiragaszt {
+    0%   { opacity: 0; transform: rotate(-4deg) scale(1.06); }
+    100% { opacity: 1; transform: rotate(-1.2deg) scale(1); }
+  }
+
+  .lap {
+    position: relative;
+    padding: 30px 24px 22px;
+    text-align: center;
+    background: var(--paper) url("papir.jpg") center top / cover;
+    clip-path: polygon(0.5% 0.4%, 99.6% 0, 100% 100%, 0 99.6%);
+  }
+
+  /* a logó „rányomtatva”: a festék átveszi a papír szemcséjét */
+  .jel {
+    width: 76%;
     margin: 0 auto;
-    aspect-ratio: 640 / 334;
+    aspect-ratio: 640 / 332;
+    mix-blend-mode: multiply;
     transform-origin: 50% 58%;
     animation: dobbanas var(--beat) ease-out infinite;
   }
-  .jel img,
-  .jel .reteg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .jel img { display: block; width: 100%; height: 100%; }
 
-  .fenyl {
-    position: absolute;
-    inset: 8% 12%;
-    background: radial-gradient(closest-side, rgba(253, 96, 70, .55), rgba(253, 96, 70, 0));
-    filter: blur(22px);
-    opacity: .15;
-    animation: fenyl var(--beat) ease-out infinite;
-  }
-
-  .hullam {
-    -webkit-mask: url("sziv-hullam.png") center / 100% 100% no-repeat;
-            mask: url("sziv-hullam.png") center / 100% 100% no-repeat;
-    background-color: var(--korall);
-    background-image: linear-gradient(90deg,
-      rgba(255, 236, 230, 0) 0%, rgba(255, 236, 230, 0) 45%,
-      rgba(255, 236, 230, .95) 50%,
-      rgba(255, 236, 230, 0) 55%, rgba(255, 236, 230, 0) 100%);
-    background-size: 300% 100%;
-    background-repeat: no-repeat;
-    background-position: 100% 0;
-    animation: impulzus var(--beat) cubic-bezier(.45, 0, .3, 1) infinite;
-  }
-
-  /* színcsatornák: a logó cián és ibolya másolata, kicsit elcsúszva */
-  .csatorna {
-    mix-blend-mode: screen;
-    opacity: .9;
-    animation: var(--glitch) steps(1) infinite 1.2s;
-  }
-  .jel .csatorna {
-    -webkit-mask: url("sziv-maszk.png") center / 100% 100% no-repeat;
-            mask: url("sziv-maszk.png") center / 100% 100% no-repeat;
-  }
-  .felirat .csatorna {
-    position: absolute;
-    inset: 0;
-    -webkit-mask: url("logo-szoveg.png") center / 100% 100% no-repeat;
-            mask: url("logo-szoveg.png") center / 100% 100% no-repeat;
-  }
-  .csatorna { --d: 2px; }
-  .felirat .csatorna { --d: 1px; }
-  .cian   { background: var(--cian);   transform: translateX(calc(var(--d) * -1)); animation-name: csusz-c; }
-  .ibolya { background: var(--ibolya); transform: translateX(var(--d));            animation-name: csusz-i; }
-
-  .felirat { position: relative; margin: 16px auto 0; width: 92%; line-height: 0; }
-  .felirat img { position: relative; z-index: 1; width: 100%; height: auto; }
+  .felirat { width: 88%; margin: 14px auto 0; line-height: 0; mix-blend-mode: multiply; }
+  .felirat img { width: 100%; height: auto; }
 
   @keyframes dobbanas {
     0%   { transform: scale(1); }
-    10%  { transform: scale(1.075); }
+    10%  { transform: scale(1.07); }
     21%  { transform: scale(.985); }
-    32%  { transform: scale(1.04); }
+    32%  { transform: scale(1.035); }
     50%, 100% { transform: scale(1); }
   }
-  @keyframes fenyl {
-    0%   { opacity: .15; transform: scale(.92); }
-    10%  { opacity: .85; transform: scale(1.08); }
-    32%  { opacity: .6;  transform: scale(1.04); }
-    70%, 100% { opacity: .15; transform: scale(.92); }
-  }
-  @keyframes impulzus {
-    0%   { background-position: 100% 0; }
-    55%, 100% { background-position: 0% 0; }
-  }
-  /* betöltéskor „bekapcsol” a kép, mint egy régi monitor */
-  @keyframes bekapcs {
-    0%   { opacity: 0; }
-    20%  { opacity: 1; transform: skewX(-12deg); }
-    35%  { opacity: .3; transform: none; }
-    50%  { opacity: 1; transform: translateX(6px); }
-    65%  { opacity: 1; transform: none; }
-  }
-  /* néhány másodpercenként rövid adáshiba */
-  @keyframes remeg {
-    0%, 86%  { transform: none; }
-    87%      { transform: skewX(-6deg) translateX(-3px); }
-    88%      { transform: skewX(4deg) translateX(4px); }
-    89%, 94% { transform: none; }
-    95%      { transform: translateX(-5px); }
-    96%,100% { transform: none; }
-  }
-  @keyframes csusz-c {
-    0%, 86%  { transform: translateX(calc(var(--d) * -1)); clip-path: inset(0); }
-    87%      { transform: translate(-11px, 1px); clip-path: inset(10% 0 62% 0); }
-    88%      { transform: translate(8px, -1px);  clip-path: inset(46% 0 22% 0); }
-    89%      { transform: translate(-5px, 0);    clip-path: inset(72% 0 6% 0); }
-    90%, 94% { transform: translateX(calc(var(--d) * -1)); clip-path: inset(0); }
-    95%      { transform: translate(-9px, 0);    clip-path: inset(30% 0 48% 0); }
-    96%,100% { transform: translateX(calc(var(--d) * -1)); clip-path: inset(0); }
-  }
-  @keyframes csusz-i {
-    0%, 86%  { transform: translateX(var(--d)); clip-path: inset(0); }
-    87%      { transform: translate(10px, -1px); clip-path: inset(55% 0 15% 0); }
-    88%      { transform: translate(-7px, 1px);  clip-path: inset(5% 0 70% 0); }
-    89%      { transform: translate(6px, 0);     clip-path: inset(38% 0 40% 0); }
-    90%, 94% { transform: translateX(var(--d)); clip-path: inset(0); }
-    95%      { transform: translate(9px, 0);     clip-path: inset(60% 0 18% 0); }
-    96%,100% { transform: translateX(var(--d)); clip-path: inset(0); }
+
+  .felhivas {
+    margin-top: 22px;
+    font-style: italic;
+    font-size: clamp(1.25rem, 5.6vw, 1.45rem);
+    line-height: 1.1;
+    color: var(--tinta);
   }
 
-  /* ================= Linkek: matricák ================= */
+  /* ================= Letéphető cetlik ================= */
 
-  .linkek {
+  .cetlik {
     list-style: none;
-    width: 100%;
-    margin-top: clamp(30px, 5.5vh, 50px);
     display: grid;
-    gap: 20px;
-  }
-  .linkek li { animation: felragaszt .4s cubic-bezier(.2, .9, .3, 1.3) both; }
-  .linkek li:nth-child(1) { animation-delay: .45s; }
-  .linkek li:nth-child(2) { animation-delay: .57s; }
-  .linkek li:nth-child(3) { animation-delay: .69s; }
-  @keyframes felragaszt {
-    0%   { opacity: 0; transform: scale(1.15); }
-    100% { opacity: 1; transform: none; }
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;               /* az ollóvágások között látszik a fal */
   }
 
-  .linkek a {
-    --forma: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+  .cetli {
     position: relative;
     display: block;
-    color: var(--betu);
+    height: 200px;
+    color: var(--tinta);
     text-decoration: none;
-    transform: rotate(var(--szog));
-    transition: transform .18s cubic-bezier(.2, .9, .3, 1.4);
+    background: var(--paper) url("papir.jpg") var(--hely, 30%) 88% / 600px auto;
+    border-top: 2px dashed rgba(28, 32, 52, .4);       /* perforáció */
+    clip-path: polygon(0 0, 100% 0, 100% 99%, 70% 100%, 35% 98.5%, 0 100%);
+    transform-origin: 50% 0;
+    transform: rotate(var(--szog, 0deg));
+    transition: transform .25s cubic-bezier(.3, 1.4, .5, 1);
     -webkit-tap-highlight-color: transparent;
   }
-  .linkek a::before {            /* színes „árnyék”, mint egy elcsúszott nyomat */
-    content: "";
+  .cetlik li:nth-child(1) .cetli { --szog: 1.4deg;  --hely: 12%; }
+  .cetlik li:nth-child(2) .cetli { --szog: -.8deg;  --hely: 46%; }
+  .cetlik li:nth-child(3) .cetli { --szog: 2.1deg;  --hely: 78%; }
+
+  .cetli:hover,
+  .cetli:focus-visible { transform: rotate(calc(var(--szog, 0deg) + 5deg)) translateY(3px); }
+  .cetli:active { transform: rotate(calc(var(--szog, 0deg) + 10deg)) translateY(9px); transition-duration: .1s; }
+  .cetli:focus-visible { outline: 3px solid var(--korall); outline-offset: 3px; }
+
+  /* a szöveg 90°-kal elforgatva, alulról felfelé – mint az igazi cetliken */
+  .cetli-szoveg {
     position: absolute;
-    inset: 0;
-    background: var(--arnyek);
-    clip-path: var(--forma);
-    transform: translate(6px, 6px);
-    transition: transform .18s cubic-bezier(.2, .9, .3, 1.4);
+    top: calc(50% - 22px);
+    left: 50%;
+    width: 136px;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    white-space: nowrap;
   }
-  .arc {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    min-height: 64px;
-    padding: 14px 24px 13px;
-    background: var(--szin);
-    clip-path: var(--forma);
+  /* a platformok hivatalos ikonjai: állva, változtatás nélkül */
+  .ikon {
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    transform: translateX(-50%);
   }
-  .tiktok    { --szin: var(--korall); --betu: var(--ink);   --arnyek: var(--cian);   --szog: -1.8deg; }
-  .youtube   { --szin: var(--paper);  --betu: var(--ink);   --arnyek: var(--ibolya); --szog: 1.2deg; }
-  .instagram { --szin: var(--lila);   --betu: var(--paper); --arnyek: var(--korall); --szog: -.9deg; }
-
-  .linkek a:hover,
-  .linkek a:focus-visible { transform: rotate(0) scale(1.03); }
-  .linkek a:hover::before,
-  .linkek a:focus-visible::before { transform: translate(10px, 9px); }
-  .linkek a:hover .nev,
-  .linkek a:focus-visible .nev {
-    text-shadow: -2px 0 var(--cian), 2px 0 var(--ibolya);
-    animation: rezeg .25s steps(2) infinite;
-  }
-  .linkek a:active { transform: scale(.97); transition-duration: .06s; }
-  .linkek a:focus-visible { outline: 3px dashed var(--cian); outline-offset: 10px; }
-
-  @keyframes rezeg {
-    0%   { transform: translateX(0); }
-    50%  { transform: translateX(1px); }
-  }
-
-  .ikon { width: 30px; height: 30px; flex: none; }
-  .nev { display: inline-block; font-size: 2rem; line-height: 1; padding-top: 2px; }
-
+  .nev { display: block; font-size: 1.55rem; line-height: 1; }
   .handle {
-    margin-top: 22px;
-    font-family: var(--mono);
-    font-size: .9rem;
-    font-weight: 400;
-    color: rgba(242, 240, 234, .62);
-    text-align: center;
-  }
-
-  /* ================= Vészhelyzet: terminál-sor ================= */
-
-  .sos {
-    margin-top: clamp(30px, 5vh, 48px);
+    display: block;
+    margin-top: 3px;
     font-family: var(--mono);
     font-weight: 400;
-    font-size: 1rem;
-    line-height: 1.6;
-    text-align: center;
+    font-size: .68rem;
+    line-height: 1.2;
+    opacity: .78;
   }
-  .sos .jel-prompt { color: var(--cian); }
-  .sos a {
-    display: inline-block;
-    margin-left: 4px;
-    padding: 2px 10px 0;
-    background: var(--bordo);
+
+  /* valaki már letépett egyet */
+  .letepve {
+    height: 24px;
+    background: var(--paper) url("papir.jpg") 95% 88% / 600px auto;
+    border-top: 2px dashed rgba(28, 32, 52, .4);
+    clip-path: polygon(0 0, 100% 0, 100% 62%, 86% 100%, 71% 58%, 55% 92%, 38% 50%, 22% 88%, 9% 55%, 0 78%);
+  }
+
+  /* ================= Ragasztószalag ================= */
+
+  .szalag {
+    position: absolute;
+    z-index: 3;
+    top: -13px;
+    width: 92px;
+    height: 28px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, .05)),
+      rgba(226, 216, 190, .66);
+    clip-path: polygon(3% 8%, 0 30%, 4% 52%, 0 74%, 3% 100%, 97% 92%, 100% 70%, 96% 46%, 100% 24%, 97% 0);
+    animation: megjelenik .25s ease-out .45s both;
+  }
+  .szalag-bal  { left: -22px; transform: rotate(-36deg); }
+  .szalag-jobb { right: -22px; transform: rotate(38deg); }
+  @keyframes megjelenik { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ================= 112-es matrica ================= */
+
+  .matrica {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+    padding: 9px 16px 8px;
     color: var(--paper);
-    font-family: "Barlow Condensed", sans-serif;
-    font-weight: 800;
-    font-size: 1.3rem;
     text-decoration: none;
-    box-shadow: 3px 3px 0 var(--korall);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, 0) 40%),
+      var(--bordo);
+    border: 3px solid #f7f5f0;          /* kivágott matrica fehér széle */
+    border-radius: 12px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, .55);
+    transform: rotate(3deg) translateX(34px);
+    animation: matrica .3s cubic-bezier(.2, .9, .3, 1.4) .75s both;
   }
-  .sos a:focus-visible { outline: 3px dashed var(--cian); outline-offset: 4px; }
-  .kurzor {
-    display: inline-block;
-    width: .6em;
-    height: 1.1em;
-    margin-left: 6px;
-    vertical-align: -0.2em;
-    background: var(--paper);
-    animation: villog 1.05s steps(1) infinite;
+  @keyframes matrica {
+    from { opacity: 0; transform: rotate(10deg) translateX(34px) scale(1.25); }
+    to   { opacity: 1; transform: rotate(3deg) translateX(34px) scale(1); }
   }
-  @keyframes villog { 50% { opacity: 0; } }
+  .matrica-szoveg { font-style: italic; font-size: 1.1rem; line-height: 1.05; text-align: left; }
+  .matrica-szam { font-size: 2.1rem; line-height: 1; padding-top: 2px; }
+  .matrica:focus-visible { outline: 3px solid var(--korall); outline-offset: 4px; }
 
   footer {
-    padding: 0 0 max(20px, env(safe-area-inset-bottom));
+    position: relative;
+    z-index: 2;
+    margin-top: auto;
+    padding: 36px 0 max(18px, env(safe-area-inset-bottom));
     font-family: var(--mono);
-    font-size: .75rem;
-    color: rgba(242, 240, 234, .4);
+    font-size: .72rem;
+    color: rgba(242, 240, 234, .38);
+  }
+
+  @media (min-width: 760px) {
+    .plakat { width: 420px; }
+    .regi-lila { width: 300px; height: 300px; top: 70px; left: calc(50% - 520px); background-position: -520px -420px; transform: rotate(-6deg); }
+    .cafat-1 { top: 120px; left: calc(50% + 300px); width: 190px; height: 150px; }
+    .cafat-2 { bottom: 18%; left: calc(50% - 360px); }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .logo, .jel, .fenyl, .hullam, .csatorna, .linkek li, .kurzor, .linkek a:hover .nev { animation: none !important; }
-    .fenyl { opacity: .35; }
-    .linkek a, .linkek a::before { transition: none; }
+    .plakat, .jel, .szalag, .matrica { animation: none; }
+    .cetli { transition: none; }
   }
 </style>
 </head>
 <body>
 
-<main class="lap">
+<div class="fal">
 
-  <header class="logo">
-    <div class="jel" aria-hidden="true">
-      <div class="fenyl"></div>
-      <div class="reteg csatorna cian"></div>
-      <div class="reteg csatorna ibolya"></div>
-      <img src="sziv-feher.png" alt="" width="640" height="334">
-      <div class="reteg hullam"></div>
+  <div class="regi regi-lila" aria-hidden="true"></div>
+  <div class="regi cafat cafat-1" aria-hidden="true"></div>
+  <div class="regi cafat cafat-2" aria-hidden="true"></div>
+
+  <main class="plakat">
+    <span class="szalag szalag-bal" aria-hidden="true"></span>
+    <span class="szalag szalag-jobb" aria-hidden="true"></span>
+
+    <div class="lap">
+      <div class="jel" aria-hidden="true">
+        <img src="szivek-nyomat.png" alt="" width="640" height="332">
+      </div>
+      <h1 class="felirat">
+        <img src="felirat-nyomat.png" width="640" height="279"
+             alt="Szívós Szervezet – Bulizzunk, de figyeljünk egymásra.">
+      </h1>
+      <p class="felhivas">Tépj le egyet, és kövess minket!</p>
     </div>
-    <h1 class="felirat">
-      <span class="csatorna cian" aria-hidden="true"></span>
-      <span class="csatorna ibolya" aria-hidden="true"></span>
-      <img src="logo-szoveg.png" width="640" height="280"
-           alt="Szívós Szervezet – Bulizzunk, de figyeljünk egymásra.">
-    </h1>
-  </header>
 
-  <nav aria-label="Közösségi oldalaink">
-    <ul class="linkek">
-      <li>
-        <a class="tiktok" href="https://www.tiktok.com/@szivos.szervezet" target="_blank" rel="noopener noreferrer">
-          <span class="arc">
-            <svg class="ikon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>
-            </svg>
-            <span class="nev">TikTok</span>
-          </span>
-        </a>
-      </li>
-      <li>
-        <a class="youtube" href="https://www.youtube.com/@szivos.szervezet" target="_blank" rel="noopener noreferrer">
-          <span class="arc">
-            <svg class="ikon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round" aria-hidden="true">
-              <rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z" fill="currentColor"/>
-            </svg>
-            <span class="nev">YouTube</span>
-          </span>
-        </a>
-      </li>
-      <li>
-        <a class="instagram" href="https://www.instagram.com/szivos.szervezet" target="_blank" rel="noopener noreferrer">
-          <span class="arc">
-            <svg class="ikon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/>
-            </svg>
-            <span class="nev">Instagram</span>
-          </span>
-        </a>
-      </li>
-    </ul>
-    <p class="handle">Mindhárom helyen: @szivos.szervezet</p>
-  </nav>
+    <nav aria-label="Közösségi oldalaink">
+      <ul class="cetlik">
+        <li>
+          <a class="cetli" href="https://www.tiktok.com/@szivos.szervezet" target="_blank" rel="noopener noreferrer">
+            <span class="cetli-szoveg">
+              <span><span class="nev">TikTok</span><span class="handle">@szivos.szervezet</span></span>
+            </span>
+            <img class="ikon" src="tiktok.png" alt="" width="32" height="32">
+          </a>
+        </li>
+        <li>
+          <a class="cetli" href="https://www.youtube.com/@szivos.szervezet" target="_blank" rel="noopener noreferrer">
+            <span class="cetli-szoveg">
+              <span><span class="nev">YouTube</span><span class="handle">@szivos.szervezet</span></span>
+            </span>
+            <img class="ikon" src="youtube.png" alt="" width="32" height="32">
+          </a>
+        </li>
+        <li>
+          <a class="cetli" href="https://www.instagram.com/szivos.szervezet" target="_blank" rel="noopener noreferrer">
+            <span class="cetli-szoveg">
+              <span><span class="nev">Instagram</span><span class="handle">@szivos.szervezet</span></span>
+            </span>
+            <img class="ikon" src="instagram.png" alt="" width="32" height="32">
+          </a>
+        </li>
+        <li aria-hidden="true"><div class="letepve"></div></li>
+      </ul>
+    </nav>
+  </main>
 
-  <p class="sos">
-    <span class="jel-prompt" aria-hidden="true">&gt;</span>
-    Ha valaki rosszul van: <a href="tel:112">112</a><span class="kurzor" aria-hidden="true"></span>
-  </p>
+  <a class="matrica" href="tel:112">
+    <span class="matrica-szoveg">Ha valaki<br>rosszul van:</span>
+    <span class="matrica-szam">112</span>
+  </a>
 
-</main>
+  <footer>© 2026 Szívós Szervezet</footer>
 
-<footer>© 2026 Szívós Szervezet</footer>
+</div>
 
 </body>
 </html>
